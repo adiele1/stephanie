@@ -10,6 +10,7 @@ import { Occasion } from './screens/onboarding/Occasion';
 import { Finding } from './screens/looks/Finding';
 import { Grid } from './screens/looks/Grid';
 import { Detail } from './screens/looks/Detail';
+import { Steps } from './screens/looks/Steps';
 import { PlaceholderNext } from './screens/PlaceholderNext';
 
 function App() {
@@ -28,7 +29,8 @@ function App() {
             <Route path="/looks/finding" element={<Finding />} />
             <Route path="/looks/grid" element={<Grid />} />
             <Route path="/looks/detail" element={<Detail />} />
-            <Route path="/looks/steps" element={<PlaceholderNext />} />
+            <Route path="/looks/steps" element={<Steps />} />
+            <Route path="/looks/completion" element={<PlaceholderNext />} />
           </Routes>
         </SessionProvider>
       </OnboardingProvider>

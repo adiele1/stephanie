@@ -1,0 +1,53 @@
+/* Per-step technique diagram animation — ported from the validated v2 design preview.
+   A tool (sponge/brush/pencil) travels an offset-path while a color/fill "builds up"
+   in sync, rather than an abstract dot on an invisible line. No-op under
+   prefers-reduced-motion. */
+.tech-applicator {
+  offset-distance: 0%;
+  offset-rotate: 0deg;
+}
+.tech-fill {
+  opacity: 0;
+}
+.tech-glow {
+  opacity: 0;
+}
+.tech-tick {
+  stroke-dashoffset: 8;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tech-anim-a { animation: techOffset 2.6s linear infinite; }
+  .tech-anim-b { animation: techOffset 1.7s ease-in-out infinite; }
+  .tech-anim-c { animation: techOffset 1.4s ease-in-out infinite; }
+  .tech-anim-d { animation: techOffset 2.1s linear infinite; }
+  .tech-anim-e { animation: techOffset 2.4s ease-in-out infinite alternate; }
+  .tech-fill-b { animation: techFillPulse 1.7s ease-in-out infinite; }
+  .tech-fill-c { animation: techFillPulse 1.4s ease-in-out infinite; }
+  .tech-fill-d { animation: techFillBuild 2.1s ease-in-out infinite; }
+  .tech-glow-a { animation: techFillPulse 2.6s ease-in-out infinite; }
+  .tech-tick { animation: techDraw 2.4s ease-in-out infinite; }
+}
+
+@keyframes techOffset {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+@keyframes techFillPulse {
+  0%, 100% { opacity: 0; }
+  55% { opacity: 0; }
+  80% { opacity: 0.6; }
+  95% { opacity: 0.6; }
+}
+@keyframes techFillBuild {
+  0%, 30% { opacity: 0; }
+  85% { opacity: 1; }
+  100% { opacity: 1; }
+}
+@keyframes techDraw {
+  0%, 8% { stroke-dashoffset: 8; opacity: 0.9; }
+  30% { stroke-dashoffset: 0; opacity: 1; }
+  75% { stroke-dashoffset: 0; opacity: 1; }
+  92%, 100% { stroke-dashoffset: 8; opacity: 0; }
+}
