@@ -1,30 +1,29 @@
-// Temporary sanity-check screen — confirms fonts/palette/tokens are wired up correctly.
-// Gets replaced by the real onboarding flow.
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { OnboardingProvider } from './state/OnboardingContext';
+import { Welcome } from './screens/onboarding/Welcome';
+import { SkinType } from './screens/onboarding/SkinType';
+import { Skill } from './screens/onboarding/Skill';
+import { Profession } from './screens/onboarding/Profession';
+import { Camera } from './screens/onboarding/Camera';
+import { Occasion } from './screens/onboarding/Occasion';
+import { PlaceholderNext } from './screens/PlaceholderNext';
+
 function App() {
   return (
-    <div
-      style={{
-        minHeight: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 16,
-        padding: 24,
-        textAlign: 'center',
-        background:
-          'linear-gradient(180deg, oklch(93% 0.035 255) 0%, var(--color-page-bg) 60%)',
-      }}
-    >
-      <h1 style={{ fontSize: 28, fontWeight: 600 }}>Glowith</h1>
-      <p style={{ color: 'var(--color-muted)', maxWidth: 260, lineHeight: 1.5 }}>
-        Design tokens loaded — Fredoka display type, Nunito Sans body, blue-led palette
-        on a blush background.
-      </p>
-      <button className="btn-primary" style={{ width: 'auto', padding: '14px 28px' }}>
-        Get Started
-      </button>
-    </div>
+    <BrowserRouter>
+      <OnboardingProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/onboarding" replace />} />
+          <Route path="/onboarding" element={<Welcome />} />
+          <Route path="/onboarding/skin-type" element={<SkinType />} />
+          <Route path="/onboarding/skill" element={<Skill />} />
+          <Route path="/onboarding/profession" element={<Profession />} />
+          <Route path="/onboarding/camera" element={<Camera />} />
+          <Route path="/onboarding/occasion" element={<Occasion />} />
+          <Route path="/looks/finding" element={<PlaceholderNext />} />
+        </Routes>
+      </OnboardingProvider>
+    </BrowserRouter>
   );
 }
 
