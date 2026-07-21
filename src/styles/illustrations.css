@@ -34,6 +34,17 @@
     transform-origin: 50% 50%;
     animation: illoBlink 4.6s ease-in-out infinite;
   }
+  .illo-arm-l {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: illoWave 1.5s ease-in-out infinite;
+  }
+  .illo-arm-r {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: illoWave 1.5s ease-in-out infinite reverse;
+    animation-delay: 0.15s;
+  }
 }
 
 @keyframes illoBob {
@@ -55,4 +66,8 @@
 @keyframes illoBlink {
   0%, 90%, 100% { transform: scaleY(1); }
   95% { transform: scaleY(0.15); }
+}
+@keyframes illoWave {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
 }
