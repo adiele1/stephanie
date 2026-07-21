@@ -45,7 +45,7 @@ function UploadSlot({
           height,
           borderRadius: 22,
           border: '2.5px dashed oklch(78% 0.08 255)',
-          background: previewUrl ? 'transparent' : 'var(--color-blue-pale)',
+          backgroundColor: previewUrl ? 'transparent' : 'var(--color-blue-pale)',
           color: 'var(--color-blue-dark)',
           fontSize: 12.5,
           fontWeight: 600,
