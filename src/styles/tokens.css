@@ -1,0 +1,106 @@
+/* Glowith design tokens — ported from the approved v2 (playful/illustrated) design preview.
+   Palette, type, and shape decisions were validated there before being made real here;
+   this file is the single source of truth going forward, not the artifact. */
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/nunito-sans.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/fredoka.woff2') format('woff2');
+}
+
+:root {
+  /* color */
+  --color-blue: oklch(66% 0.16 255);
+  --color-blue-dark: oklch(42% 0.16 255);
+  --color-blue-deep: oklch(50% 0.17 258);
+  --color-blue-pale: oklch(93% 0.035 255);
+
+  --color-pink-bg: oklch(95% 0.025 20);
+  --color-pink-deep: oklch(80% 0.09 15);
+
+  --color-coral: oklch(78% 0.12 40);
+  --color-coral-dark: oklch(55% 0.15 32);
+  --color-coral-pale: oklch(94% 0.045 40);
+
+  --color-mint: oklch(85% 0.075 175);
+  --color-mint-dark: oklch(46% 0.09 175);
+  --color-lavender: oklch(87% 0.06 305);
+  --color-lavender-dark: oklch(50% 0.11 305);
+  --color-peach: oklch(88% 0.07 60);
+  --color-peach-dark: oklch(52% 0.1 45);
+
+  --color-ink: oklch(26% 0.03 265);
+  --color-muted: oklch(52% 0.02 265);
+  --color-border: oklch(90% 0.012 90);
+  --color-white: oklch(99% 0.004 75);
+
+  --color-page-bg: oklch(96% 0.012 40);
+  --color-page-fg: var(--color-ink);
+  --color-panel-bg: var(--color-white);
+  --color-chip-bg: oklch(94% 0.012 60);
+
+  /* type */
+  --font-display: 'Fredoka', sans-serif;
+  --font-body: 'Nunito Sans', sans-serif;
+
+  /* shape */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+}
+
+:root[data-theme='dark'] {
+  --color-page-bg: oklch(17% 0.014 265);
+  --color-page-fg: oklch(94% 0.006 90);
+  --color-panel-bg: oklch(22% 0.017 265);
+  --color-chip-bg: oklch(27% 0.016 265);
+  --color-border: oklch(32% 0.014 265);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-page-bg: oklch(17% 0.014 265);
+    --color-page-fg: oklch(94% 0.006 90);
+    --color-panel-bg: oklch(22% 0.017 265);
+    --color-chip-bg: oklch(27% 0.016 265);
+    --color-border: oklch(32% 0.014 265);
+  }
+}
+
+/* shared primitives used across screens */
+.btn-primary {
+  background: var(--color-blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 16px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 12px 22px oklch(66% 0.16 255 / 0.38);
+  width: 100%;
+}
+.btn-primary:disabled {
+  background: var(--color-border);
+  box-shadow: none;
+  cursor: default;
+}
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+}

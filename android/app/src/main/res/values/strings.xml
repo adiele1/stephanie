@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Glowith</string>
+    <string name="title_activity_main">Glowith</string>
+    <string name="package_name">com.glowith.app</string>
+    <string name="custom_url_scheme">com.glowith.app</string>
+</resources>
