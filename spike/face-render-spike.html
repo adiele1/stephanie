@@ -1,0 +1,216 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Glowith — face render spike</title>
+<style>
+  body{margin:0;padding:24px;background:#f4f1ee;font-family:system-ui,sans-serif;color:#222;}
+  h1{font-size:18px;margin:0 0 4px;}
+  .sub{color:#666;font-size:13px;margin:0 0 18px;max-width:640px;line-height:1.5;}
+  .row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .panel{background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+  canvas{display:block;border-radius:8px;background:#eee;max-width:420px;}
+  .controls{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  label{font-size:12.5px;font-weight:600;color:#444;display:flex;align-items:center;gap:8px;}
+  #status{font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap;background:#111;color:#0f0;padding:10px;border-radius:8px;max-width:420px;max-height:200px;overflow:auto;}
+  button{font-size:13px;padding:8px 14px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;}
+  button:hover{background:#f0f0f0;}
+  .swatches{display:flex;gap:6px;}
+  .swatch{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #ccc;cursor:pointer;}
+  .swatch.active{box-shadow:0 0 0 2px #333;}
+</style>
+</head>
+<body>
+  <h1>Face render spike</h1>
+  <p class="sub">Validates the core technical risk from the project brief: MediaPipe Face Landmarker (on-device WASM) detecting a face, then Canvas blend-mode compositing painting eyeshadow / blush / lip color onto the real photo — no ML training, no generative model. Drop a selfie below.</p>
+
+  <div class="row">
+    <div class="panel">
+      <div class="controls">
+        <label>Photo: <input type="file" id="fileInput" accept="image/*"></label>
+        <label><input type="checkbox" id="showLandmarks"> show landmark debug overlay</label>
+        <div class="swatches" id="hueSwatches"></div>
+        <button id="rerender">Re-render look</button>
+      </div>
+      <canvas id="outCanvas" width="420" height="420"></canvas>
+    </div>
+    <div class="panel">
+      <div id="status">waiting for MediaPipe to load…</div>
+    </div>
+  </div>
+
+<script type="module">
+import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+const statusEl = document.getElementById('status');
+const canvas = document.getElementById('outCanvas');
+const ctx = canvas.getContext('2d');
+const fileInput = document.getElementById('fileInput');
+const showLandmarksEl = document.getElementById('showLandmarks');
+const rerenderBtn = document.getElementById('rerender');
+const hueSwatchesEl = document.getElementById('hueSwatches');
+
+function log(msg){
+  statusEl.textContent += (statusEl.textContent ? '\n' : '') + msg;
+  console.log(msg);
+}
+
+// MediaPipe FaceMesh canonical index polygons (well-documented, not something we invented).
+const LIPS_OUTER = [61,185,40,39,37,0,267,269,270,409,291,375,321,405,314,17,84,181,91,146,61];
+const LIPS_INNER = [78,191,80,81,82,13,312,311,310,415,308,324,318,402,317,14,87,178,88,95,78];
+// Right eye (subject's right, image-left) upper contour — used as the base of the eyeshadow lid polygon.
+const RIGHT_EYE_UPPER = [33,246,161,160,159,158,157,173,133];
+const RIGHT_BROW = [70,63,105,66,107,55,65];
+const LEFT_EYE_UPPER = [263,466,388,387,386,385,384,398,362];
+const LEFT_BROW = [300,293,334,296,336,285,295];
+const RIGHT_CHEEK = 205, LEFT_CHEEK = 425; // single landmark used as a blush center
+
+let HUE = 255; // periwinkle blue, matches the app's default look accent
+const HUES = [255, 30, 280, 340];
+HUES.forEach(h=>{
+  const s = document.createElement('div');
+  s.className = 'swatch' + (h===HUE?' active':'');
+  s.style.background = `oklch(70% 0.14 ${h})`;
+  s.onclick = ()=>{ HUE = h; [...hueSwatchesEl.children].forEach(c=>c.classList.remove('active')); s.classList.add('active'); renderLook(); };
+  hueSwatchesEl.appendChild(s);
+});
+
+let faceLandmarker = null;
+let currentImage = null;
+let currentLandmarks = null;
+
+async function init(){
+  log('loading MediaPipe wasm runtime…');
+  const filesetResolver = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+  );
+  log('runtime loaded. loading face_landmarker model…');
+  faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+      delegate: "GPU"
+    },
+    outputFaceBlendshapes: false,
+    runningMode: "IMAGE",
+    numFaces: 1
+  });
+  log('READY. Drop a photo to test.');
+}
+init().catch(e => log('INIT ERROR: ' + e.message));
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    currentImage = img;
+    detectAndRender();
+  };
+  img.src = url;
+});
+
+function detectAndRender(){
+  if(!faceLandmarker || !currentImage) return;
+  const t0 = performance.now();
+  const result = faceLandmarker.detect(currentImage);
+  const t1 = performance.now();
+  if(!result.faceLandmarks || !result.faceLandmarks.length){
+    log('NO FACE DETECTED in ' + (t1-t0).toFixed(1) + 'ms — try a clearer front-facing photo.');
+    canvas.width = currentImage.width; canvas.height = currentImage.height;
+    ctx.drawImage(currentImage, 0, 0);
+    currentLandmarks = null;
+    return;
+  }
+  currentLandmarks = result.faceLandmarks[0];
+  log(`face detected in ${(t1-t0).toFixed(1)}ms — ${currentLandmarks.length} landmarks`);
+  renderLook();
+}
+
+function pt(idx, w, h){
+  const p = currentLandmarks[idx];
+  return [p.x*w, p.y*h];
+}
+function polygon(indices, w, h){
+  return indices.map(i => pt(i, w, h));
+}
+function fillPoly(points, fillStyle, composite, alpha){
+  ctx.save();
+  ctx.globalCompositeOperation = composite;
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  points.forEach(([x,y],i)=> i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));
+  ctx.closePath();
+  ctx.filter = 'blur(2px)';
+  ctx.fill();
+  ctx.restore();
+}
+
+function renderLook(){
+  if(!currentImage) return;
+  const w = currentImage.width, h = currentImage.height;
+  canvas.width = w; canvas.height = h;
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(currentImage, 0, 0, w, h);
+
+  if(currentLandmarks){
+    const lipColor = `oklch(55% 0.15 25)`;
+    const shadowColor = `oklch(75% 0.12 ${HUE})`;
+    const blushColor = `oklch(78% 0.11 30)`;
+
+    // Lips — multiply so lip texture still shows through
+    fillPoly(polygon(LIPS_OUTER, w, h), lipColor, 'multiply', 0.75);
+
+    // Eyeshadow — approximate lid area by lofting the upper-eye contour up toward the brow,
+    // since MediaPipe FaceMesh has no explicit "lid" landmark group.
+    function lidPolygon(eyeIdx, browIdx){
+      const eye = polygon(eyeIdx, w, h);
+      const brow = polygon(browIdx, w, h);
+      const lifted = eye.map(([x,y], i) => {
+        const b = brow[Math.min(i, brow.length-1)];
+        return [x*0.45 + b[0]*0.55, y*0.45 + b[1]*0.55];
+      });
+      return [...eye, ...lifted.reverse()];
+    }
+    fillPoly(lidPolygon(RIGHT_EYE_UPPER, RIGHT_BROW), shadowColor, 'overlay', 0.55);
+    fillPoly(lidPolygon(LEFT_EYE_UPPER, LEFT_BROW), shadowColor, 'overlay', 0.55);
+
+    // Blush — soft radial gradient centered on each cheek landmark
+    [RIGHT_CHEEK, LEFT_CHEEK].forEach(idx => {
+      const [cx, cy] = pt(idx, w, h);
+      const r = w * 0.09;
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      grad.addColorStop(0, blushColor);
+      grad.addColorStop(1, 'transparent');
+      ctx.save();
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    if(showLandmarksEl.checked){
+      ctx.save();
+      ctx.fillStyle = 'lime';
+      currentLandmarks.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x*w, p.y*h, 1.2, 0, Math.PI*2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+  }
+}
+
+rerenderBtn.addEventListener('click', renderLook);
+showLandmarksEl.addEventListener('change', renderLook);
+
+// debug hook for automated verification only — not needed by the actual UI
+window.__spike = { get landmarks(){ return currentLandmarks; }, pt, LIPS_OUTER, RIGHT_CHEEK, LEFT_CHEEK, RIGHT_EYE_UPPER, RIGHT_BROW };
+</script>
+</body>
+</html>

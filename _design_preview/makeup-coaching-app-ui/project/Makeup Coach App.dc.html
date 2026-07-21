@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: oklch(95% 0.01 90); font-family: 'Nunito Sans', sans-serif; }
+  * { box-sizing: border-box; }
+  @keyframes glowPulse { 0%,100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+  @keyframes floatUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+  @keyframes burst { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(340px) rotate(340deg); opacity: 0; } }
+  @keyframes toastIn { 0% { opacity: 0; transform: translate(-50%, 12px); } 100% { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+</helmet>
+
+<section id="1a" style="position: relative; padding: 48px 24px 96px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <span style="background: oklch(70% 0.10 235); color: white; font-family: 'Poppins',sans-serif; font-weight:700; font-size:13px; padding:5px 12px; border-radius:999px;">1a</span>
+    <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; color: oklch(28% 0.03 260); margin:0;">Glowith — Personalized Makeup Coach</h2>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:40px; justify-content:center; align-items:flex-start;">
+    <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" title="{{ frameTitle }}" hint-size="390,844">
+
+      <sc-if value="{{ sWelcome }}" hint-placeholder-val="{{ true }}">
+        <div style="height:100%; display:flex; flex-direction:column; justify-content:space-between; background: linear-gradient(180deg, oklch(94% 0.03 235) 0%, oklch(97% 0.014 75) 55%); padding: 28px 24px 40px;">
+          <div></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:18px; text-align:center;">
+            <div style="width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 35% 30%, oklch(85% 0.06 235), oklch(65% 0.11 235)); box-shadow: 0 18px 40px oklch(70% 0.10 235 / 0.35); display:flex;align-items:center;justify-content:center;">
+              <div style="width:48px;height:48px;border-radius:50%;background: oklch(99% 0.004 75 / 0.9);"></div>
+            </div>
+            <h1 style="font-family:'Poppins',sans-serif; font-weight:800; font-size:32px; color: oklch(28% 0.03 260); margin:0; line-height:1.15;">Your face,<br/>your perfect look.</h1>
+            <p style="font-size:16px; color: oklch(52% 0.02 260); margin:0; max-width:280px; line-height:1.5;">A personal makeup artist in your pocket — matched to your skin, guided step by step.</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <button onClick="{{ toSkin }}" style="background: oklch(70% 0.10 235); color:white; border:none; border-radius:999px; padding:17px; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; box-shadow: 0 10px 24px oklch(70% 0.10 235 / 0.4);">Get Started</button>
+            <p style="text-align:center; font-size:13px; color: oklch(52% 0.02 260); margin:0;">Takes about 2 minutes</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sSkin }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75); padding: 20px 24px 32px;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+            <button onClick="{{ toWelcome }}" style="width:36px;height:36px;border-radius:50%;border:none;background:oklch(93% 0.01 90);font-size:16px;color:oklch(28% 0.03 260);">←</button>
+            <div style="flex:1; height:6px; background: oklch(90% 0.012 90); border-radius:999px; overflow:hidden;">
+              <div style="width:16%; height:100%; background: oklch(70% 0.10 235); border-radius:999px;"></div>
+            </div>
+          </div>
+          <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:24px; color:oklch(28% 0.03 260); margin:20px 0 6px;">What's your skin type?</h2>
+          <p style="font-size:14px; color:oklch(52% 0.02 260); margin:0 0 20px;">So we can recommend products that actually work for you.</p>
+          <div style="display:flex; flex-direction:column; gap:10px; overflow-y:auto;">
+            <sc-for list="{{ skinTypes }}" as="opt" hint-placeholder-count="5">
+              <button onClick="{{ opt.onSelect }}" style="display:flex; align-items:center; justify-content:space-between; text-align:left; padding:16px 18px; border-radius:18px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:16px; background:{{ opt.bg }}; border:2px solid {{ opt.border }}; color:{{ opt.color }};">
+                {{ opt.label }}
+                <sc-if value="{{ opt.selected }}" hint-placeholder-val="{{ false }}"><span style="color: oklch(70% 0.10 235); font-size:18px;">✓</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+          <div style="flex:1;"></div>
+          <button onClick="{{ toSkill }}" disabled="{{ skinNextDisabled }}" style="background: {{ skinNextBg }}; color:white; border:none; border-radius:999px; padding:17px; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; margin-top:16px;">Next</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sSkill }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75); padding: 20px 24px 32px;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+            <button onClick="{{ toSkin }}" style="width:36px;height:36px;border-radius:50%;border:none;background:oklch(93% 0.01 90);font-size:16px;color:oklch(28% 0.03 260);">←</button>
+            <div style="flex:1; height:6px; background: oklch(90% 0.012 90); border-radius:999px; overflow:hidden;">
+              <div style="width:33%; height:100%; background: oklch(70% 0.10 235); border-radius:999px;"></div>
+            </div>
+          </div>
+          <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:24px; color:oklch(28% 0.03 260); margin:20px 0 6px;">How would you describe your skill?</h2>
+          <p style="font-size:14px; color:oklch(52% 0.02 260); margin:0 0 20px;">We'll pace the tutorials to match.</p>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <sc-for list="{{ skillLevels }}" as="opt" hint-placeholder-count="3">
+              <button onClick="{{ opt.onSelect }}" style="display:flex; flex-direction:column; gap:4px; text-align:left; padding:18px; border-radius:18px; font-family:'Nunito Sans',sans-serif; background:{{ opt.bg }}; border:2px solid {{ opt.border }};">
+                <span style="font-weight:700; font-size:16px; color:{{ opt.color }};">{{ opt.label }}</span>
+                <span style="font-weight:400; font-size:13px; color: oklch(52% 0.02 260);">{{ opt.desc }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="flex:1;"></div>
+          <button onClick="{{ toProfession }}" disabled="{{ skillNextDisabled }}" style="background: {{ skillNextBg }}; color:white; border:none; border-radius:999px; padding:17px; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; margin-top:16px;">Next</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sProfession }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75); padding: 20px 24px 32px;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+            <button onClick="{{ toSkill }}" style="width:36px;height:36px;border-radius:50%;border:none;background:oklch(93% 0.01 90);font-size:16px;color:oklch(28% 0.03 260);">←</button>
+            <div style="flex:1; height:6px; background: oklch(90% 0.012 90); border-radius:999px; overflow:hidden;">
+              <div style="width:50%; height:100%; background: oklch(70% 0.10 235); border-radius:999px;"></div>
+            </div>
+          </div>
+          <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:24px; color:oklch(28% 0.03 260); margin:20px 0 6px;">What do you do?</h2>
+          <p style="font-size:14px; color:oklch(52% 0.02 260); margin:0 0 20px;">Helps us suggest looks that fit your day.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            <sc-for list="{{ professions }}" as="opt" hint-placeholder-count="6">
+              <button onClick="{{ opt.onSelect }}" style="padding:12px 18px; border-radius:999px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14px; background:{{ opt.bg }}; border:2px solid {{ opt.border }}; color:{{ opt.color }};">{{ opt.label }}</button>
+            </sc-for>
+          </div>
+          <div style="flex:1;"></div>
+          <button onClick="{{ toCamera }}" disabled="{{ professionNextDisabled }}" style="background: {{ professionNextBg }}; color:white; border:none; border-radius:999px; padding:17px; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; margin-top:16px;">Next</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sCamera }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; justify-content:space-between; background: oklch(97% 0.014 75); padding: 32px 24px 40px;">
+          <div></div>
+          <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
+            <div style="width:96px; height:96px; border-radius:28px; background: oklch(94% 0.03 235); display:flex; align-items:center; justify-content:center;">
+              <div style="width:44px;height:32px;border-radius:8px;background:oklch(70% 0.10 235); position:relative;">
+                <div style="position:absolute; top:-8px; left:14px; width:16px; height:10px; background:oklch(70% 0.10 235); border-radius:4px 4px 0 0;"></div>
+                <div style="position:absolute; inset:8px; border-radius:50%; background:oklch(97% 0.014 75);"></div>
+              </div>
+            </div>
+            <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; color:oklch(28% 0.03 260); margin:0;">We need your camera</h2>
+            <p style="font-size:15px; color:oklch(52% 0.02 260); margin:0; max-width:270px; line-height:1.5;">Your photo is processed entirely on your device. It's never uploaded, stored, or shared — it just helps us match looks to your face.</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <button onClick="{{ toOccasion }}" style="background: oklch(70% 0.10 235); color:white; border:none; border-radius:999px; padding:17px; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px;">Enable Camera</button>
+            <button onClick="{{ toOccasion }}" style="background:transparent; color:oklch(52% 0.02 260); border:none; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14px; padding:6px;">Not now</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sOccasion }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75); padding: 20px 24px 28px; overflow-y:auto;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+            <button onClick="{{ toCamera }}" style="width:36px;height:36px;border-radius:50%;border:none;background:oklch(93% 0.01 90);font-size:16px;color:oklch(28% 0.03 260);">←</button>
+            <div style="flex:1; height:6px; background: oklch(90% 0.012 90); border-radius:999px; overflow:hidden;">
+              <div style="width:75%; height:100%; background: oklch(70% 0.10 235); border-radius:999px;"></div>
+            </div>
+          </div>
+          <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; color:oklch(28% 0.03 260); margin:18px 0 4px;">What are you getting ready for?</h2>
+          <p style="font-size:14px; color:oklch(52% 0.02 260); margin:0 0 14px;">Pick an occasion and share a selfie to get started.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+            <sc-for list="{{ occasionChips }}" as="chip" hint-placeholder-count="7">
+              <button onClick="{{ chip.onSelect }}" style="padding:10px 16px; border-radius:999px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; background:{{ chip.bg }}; border:2px solid {{ chip.border }}; color:{{ chip.color }};">{{ chip.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ showOtherField }}" hint-placeholder-val="{{ false }}">
+            <input value="{{ occasionOther }}" onChange="{{ setOccasionOther }}" placeholder="Tell us what's the occasion..." style="margin:8px 0 4px; padding:14px 16px; border-radius:16px; border:2px solid oklch(90% 0.012 90); font-family:'Nunito Sans',sans-serif; font-size:15px; background:oklch(99% 0.004 75);"/>
+          </sc-if>
+          <div style="margin-top:16px; display:flex; gap:12px;">
+            <div style="flex:1;">
+              <p style="font-size:12.5px; font-weight:700; color:oklch(52% 0.02 260); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 8px;">Your selfie</p>
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="selfie-upload" shape="rounded" radius="20" placeholder="Drop your selfie — on-device only" style="width:100%; height:170px;" hint-size="100%,170px"></x-import>
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <sc-if value="{{ showStyleRef }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size:12.5px; font-weight:700; color:oklch(52% 0.02 260); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 8px;">Style reference</p>
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="style-ref" shape="rounded" radius="20" placeholder="Optional inspiration photo" style="width:100%; height:120px;" hint-size="100%,120px"></x-import>
+            </sc-if>
+            <sc-if value="{{ showStyleRefToggle }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ toggleStyleRef }}" style="background:none; border:none; color:oklch(46% 0.12 235); font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14px; padding:8px 0;">+ Add a style reference photo</button>
+            </sc-if>
+          </div>
+          <div style="flex:1;"></div>
+          <button onClick="{{ toFinding }}" disabled="{{ occasionNextDisabled }}" style="background: {{ occasionNextBg }}; color:white; border:none; border-radius:999px; padding:17px; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; margin-top:18px;">Find My Looks</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sFinding }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background: linear-gradient(180deg, oklch(94% 0.03 235), oklch(97% 0.014 75)); padding:40px;">
+          <div style="width:110px; height:110px; border-radius:50%; border:6px solid oklch(85% 0.05 235); border-top-color: oklch(58% 0.13 235); animation: glowPulse 1.4s ease-in-out infinite;"></div>
+          <p style="margin-top:28px; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; color:oklch(28% 0.03 260); text-align:center;">{{ loadingMessage }}</p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sGrid }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75);">
+          <div style="padding:18px 22px 10px; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <p style="font-size:12.5px; font-weight:700; color:oklch(46% 0.12 235); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 2px;">{{ occasionLabel }}</p>
+              <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; color:oklch(28% 0.03 260); margin:0;">Your Looks</h2>
+            </div>
+            <button onClick="{{ toOccasion }}" style="width:38px;height:38px;border-radius:50%;border:none;background:oklch(93% 0.01 90);font-size:15px;">↻</button>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:6px 22px 16px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <sc-for list="{{ looks }}" as="lk" hint-placeholder-count="4">
+              <div style="position:relative; border-radius:22px; overflow:hidden; background:oklch(99% 0.004 75); box-shadow:0 6px 18px oklch(28% 0.03 260 / 0.08);">
+                <button onClick="{{ lk.onOpen }}" style="all:unset; display:block; width:100%; cursor:pointer;">
+                  <div style="position:relative; width:100%; height:150px; background: repeating-linear-gradient(135deg, oklch(93% 0.02 235), oklch(93% 0.02 235) 10px, oklch(90% 0.025 235) 10px, oklch(90% 0.025 235) 20px);">
+                    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:10.5px; color:oklch(55% 0.02 260); text-align:center; padding:0 16px;">selfie · {{ lk.name }} applied</div>
+                    <div style="position:absolute; inset:0; background:{{ lk.tint }}; mix-blend-mode:multiply; pointer-events:none;"></div>
+                    <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, oklch(20% 0.02 260 / 0.55)); pointer-events:none;"></div>
+                    <p style="position:absolute; left:12px; bottom:10px; color:white; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; margin:0; pointer-events:none;">{{ lk.name }}</p>
+                  </div>
+                </button>
+                <button onClick="{{ lk.onToggleCompare }}" style="position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%; border:2px solid white; background:{{ lk.compareBg }}; color:white; font-size:13px; font-weight:700;">✓</button>
+                <div style="padding:10px 12px 12px; display:flex; flex-direction:column; gap:4px;">
+                  <p style="margin:0; font-size:12px; color:oklch(52% 0.02 260); font-weight:600;">{{ lk.steps }} steps · {{ lk.time }} · {{ lk.coverage }}</p>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasCompare }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; left:20px; right:20px; bottom:96px; background:oklch(28% 0.03 260); border-radius:20px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 12px 30px oklch(20% 0.02 260 / 0.35);">
+              <p style="margin:0; color:white; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14px;">{{ compareCountLabel }}</p>
+              <button onClick="{{ onAskFriendCompare }}" style="background:oklch(78% 0.11 30); color:oklch(28% 0.03 260); border:none; border-radius:999px; padding:10px 16px; font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px;">Ask a Friend</button>
+            </div>
+          </sc-if>
+          <div style="display:flex; border-top:1px solid oklch(90% 0.012 90); background:oklch(99% 0.004 75); padding:10px 0 6px;">
+            <button onClick="{{ toGridTab }}" style="flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11.5px; color:{{ tabGridColor }};">
+              <span style="width:20px;height:20px;border-radius:6px;background:{{ tabGridColor }};"></span>Discover
+            </button>
+            <button onClick="{{ toHistoryTab }}" style="flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11.5px; color:{{ tabHistoryColor }};">
+              <span style="width:20px;height:20px;border-radius:50%;background:{{ tabHistoryColor }};"></span>History
+            </button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75);">
+          <div style="position:relative; height:280px; background: repeating-linear-gradient(135deg, oklch(93% 0.02 235), oklch(93% 0.02 235) 10px, oklch(90% 0.025 235) 10px, oklch(90% 0.025 235) 20px);">
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:12px; color:oklch(55% 0.02 260); text-align:center; padding:0 20px;">selfie · {{ activeLook.name }} applied</div>
+            <div style="position:absolute; inset:0; background:{{ activeLook.tint }}; mix-blend-mode:multiply; pointer-events:none;"></div>
+            <div style="position:absolute; inset:0; background:linear-gradient(180deg, oklch(20% 0.02 260 / 0.3), transparent 30%, transparent 70%, oklch(97% 0.014 75) 100%); pointer-events:none;"></div>
+            <button onClick="{{ toGrid }}" style="position:absolute; top:18px; left:18px; width:36px;height:36px;border-radius:50%;border:none;background:oklch(99% 0.004 75 / 0.9);font-size:16px;">←</button>
+          </div>
+          <div style="flex:1; padding:16px 24px 24px; display:flex; flex-direction:column;">
+            <h2 style="font-family:'Poppins',sans-serif; font-weight:800; font-size:24px; color:oklch(28% 0.03 260); margin:0 0 4px;">{{ activeLook.name }}</h2>
+            <p style="font-size:14.5px; color:oklch(52% 0.02 260); margin:0 0 14px; line-height:1.4;">{{ activeLook.tagline }}</p>
+            <div style="display:inline-flex; align-items:center; gap:8px; background:oklch(94% 0.03 235); color:oklch(46% 0.12 235); font-weight:700; font-size:13px; padding:8px 14px; border-radius:999px; width:fit-content; margin-bottom:14px;">✓ Matched to your skin tone</div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+              <div style="flex:1; background:oklch(99% 0.004 75); border-radius:16px; padding:12px; text-align:center;"><p style="margin:0;font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;color:oklch(28% 0.03 260);">{{ activeLook.steps }}</p><p style="margin:0;font-size:11.5px;color:oklch(52% 0.02 260);">steps</p></div>
+              <div style="flex:1; background:oklch(99% 0.004 75); border-radius:16px; padding:12px; text-align:center;"><p style="margin:0;font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;color:oklch(28% 0.03 260);">{{ activeLook.time }}</p><p style="margin:0;font-size:11.5px;color:oklch(52% 0.02 260);">time</p></div>
+              <div style="flex:1; background:oklch(99% 0.004 75); border-radius:16px; padding:12px; text-align:center;"><p style="margin:0;font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;color:oklch(28% 0.03 260);">{{ activeLook.coverage }}</p><p style="margin:0;font-size:11.5px;color:oklch(52% 0.02 260);">coverage</p></div>
+            </div>
+            <div style="flex:1;"></div>
+            <div style="display:flex; gap:10px;">
+              <button onClick="{{ onAskFriendSingle }}" style="flex:1; background:oklch(94% 0.035 30); color:oklch(55% 0.14 25); border:none; border-radius:999px; padding:16px; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px;">Ask a Friend</button>
+              <button onClick="{{ toSteps }}" style="flex:2; background:oklch(70% 0.10 235); color:white; border:none; border-radius:999px; padding:16px; font-family:'Poppins',sans-serif; font-weight:700; font-size:16px;">Start This Look</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sSteps }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75); padding: 18px 20px 24px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+            <button onClick="{{ onStepBack }}" style="width:34px;height:34px;border-radius:50%;border:none;background:oklch(93% 0.01 90);font-size:15px;">←</button>
+            <p style="flex:1; text-align:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:14.5px; color:oklch(28% 0.03 260); margin:0;">{{ activeLook.name }}</p>
+            <div style="width:34px;"></div>
+          </div>
+          <div style="display:flex; gap:6px; margin-bottom:18px;">
+            <sc-for list="{{ progressDots }}" as="dot" hint-placeholder-count="5">
+              <button onClick="{{ dot.onJump }}" style="flex:1; height:8px; border-radius:999px; border:none; background:{{ dot.color }};"></button>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:{{ currentStep.iconBg }};"></div>
+            <div>
+              <p style="margin:0; font-size:11.5px; font-weight:700; color:oklch(52% 0.02 260); text-transform:uppercase; letter-spacing:0.04em;">Step {{ currentStep.number }} of {{ activeLook.steps }}</p>
+              <h3 style="margin:0; font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:oklch(28% 0.03 260);">{{ currentStep.title }}</h3>
+            </div>
+          </div>
+          <div style="flex:1; overflow-y:auto;">
+            <p style="font-size:15px; line-height:1.55; color:oklch(28% 0.03 260); margin:0 0 12px;">{{ currentStep.instruction }}</p>
+            <div style="background:oklch(94% 0.035 30); border-radius:16px; padding:14px 16px; margin-bottom:18px;">
+              <p style="margin:0 0 4px; font-size:12px; font-weight:800; color:oklch(55% 0.14 25); text-transform:uppercase; letter-spacing:0.03em;">Pro Tip</p>
+              <p style="margin:0; font-size:13.5px; line-height:1.5; color:oklch(35% 0.05 25);">{{ currentStep.tip }}</p>
+            </div>
+            <p style="margin:0 0 10px; font-size:12.5px; font-weight:800; color:oklch(52% 0.02 260); text-transform:uppercase; letter-spacing:0.04em;">Shade-Matched Products</p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <sc-for list="{{ currentStep.products }}" as="prod" hint-placeholder-count="3">
+                <div style="display:flex; align-items:center; gap:12px; background:oklch(99% 0.004 75); border-radius:16px; padding:10px 14px;">
+                  <div style="width:40px;height:40px;border-radius:10px;background:{{ prod.swatchBg }}; flex-shrink:0;"></div>
+                  <div style="flex:1; min-width:0;">
+                    <p style="margin:0; font-size:10.5px; font-weight:800; color:{{ prod.tierColor }}; text-transform:uppercase; letter-spacing:0.04em;">{{ prod.tier }}</p>
+                    <p style="margin:0; font-size:13.5px; font-weight:700; color:oklch(28% 0.03 260); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ prod.name }}</p>
+                    <p style="margin:0; font-size:12px; color:oklch(52% 0.02 260);">{{ prod.price }} · {{ prod.shade }}</p>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <button onClick="{{ onStepNext }}" style="margin-top:14px; background: oklch(70% 0.10 235); color:white; border:none; border-radius:999px; padding:16px; font-family:'Poppins',sans-serif; font-weight:700; font-size:16px;">{{ nextButtonLabel }}</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sCompletion }}" hint-placeholder-val="{{ false }}">
+        <div key="{{ completionKey }}" style="height:100%; display:flex; flex-direction:column; align-items:center; background: linear-gradient(180deg, oklch(94% 0.03 235), oklch(97% 0.014 75)); padding: 30px 22px 26px; overflow-y:auto; position:relative;">
+          <div style="position:absolute; top:0; left:20%; width:10px; height:10px; border-radius:50%; background:oklch(78% 0.11 30); animation: confettiFall 1.6s ease-in 0.1s;"></div>
+          <div style="position:absolute; top:0; left:50%; width:8px; height:8px; border-radius:50%; background:oklch(70% 0.10 235); animation: confettiFall 1.8s ease-in 0.3s;"></div>
+          <div style="position:absolute; top:0; left:75%; width:9px; height:9px; border-radius:2px; background:oklch(78% 0.11 30); animation: confettiFall 1.5s ease-in 0.2s;"></div>
+          <div style="position:absolute; top:0; left:35%; width:7px; height:7px; border-radius:2px; background:oklch(70% 0.10 235); animation: confettiFall 1.9s ease-in 0.4s;"></div>
+          <div style="animation: burst 0.6s ease-out;">
+            <h2 style="font-family:'Poppins',sans-serif; font-weight:800; font-size:24px; color:oklch(28% 0.03 260); margin:8px 0 4px; text-align:center;">You did it! ✨</h2>
+          </div>
+          <p style="font-size:14px; color:oklch(52% 0.02 260); margin:0 0 18px; text-align:center;">Your {{ activeLook.name }} look is complete</p>
+          <div style="display:flex; gap:10px; width:100%; margin-bottom:18px;">
+            <div style="flex:1;">
+              <p style="text-align:center; font-size:11.5px; font-weight:700; color:oklch(52% 0.02 260); text-transform:uppercase; margin:0 0 6px;">Before</p>
+              <div style="width:100%; height:150px; border-radius:18px; background: repeating-linear-gradient(135deg, oklch(93% 0.02 235), oklch(93% 0.02 235) 10px, oklch(90% 0.025 235) 10px, oklch(90% 0.025 235) 20px); display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:11px; color:oklch(55% 0.02 260); text-align:center; padding:0 10px;">selfie · before</div>
+            </div>
+            <div style="flex:1;">
+              <p style="text-align:center; font-size:11.5px; font-weight:700; color:oklch(52% 0.02 260); text-transform:uppercase; margin:0 0 6px;">After</p>
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="after-result" shape="rounded" radius="18" placeholder="Drop your finished look" style="width:100%; height:150px;" hint-size="100%,150px"></x-import>
+            </div>
+          </div>
+          <p style="font-size:13px; font-weight:700; color:oklch(28% 0.03 260); margin:0 0 8px;">How did it turn out?</p>
+          <div style="display:flex; gap:6px; margin-bottom:20px;">
+            <sc-for list="{{ stars }}" as="star" hint-placeholder-count="5">
+              <button onClick="{{ star.onRate }}" style="background:none; border:none; font-size:26px; color:{{ star.color }}; padding:2px;">★</button>
+            </sc-for>
+          </div>
+          <div style="display:flex; gap:10px; width:100%; margin-bottom:10px;">
+            <button onClick="{{ onSaveLook }}" style="flex:1; background:oklch(99% 0.004 75); border:2px solid oklch(70% 0.10 235); color:oklch(46% 0.12 235); border-radius:999px; padding:15px; font-family:'Poppins',sans-serif; font-weight:700; font-size:14.5px;">Save</button>
+            <button onClick="{{ onAskFriendCompletion }}" style="flex:1; background:oklch(70% 0.10 235); border:none; color:white; border-radius:999px; padding:15px; font-family:'Poppins',sans-serif; font-weight:700; font-size:14.5px;">Share</button>
+          </div>
+          <button onClick="{{ onTryAnother }}" style="background:none; border:none; color:oklch(52% 0.02 260); font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px;">Try another look</button>
+          <div style="flex:1;"></div>
+          <button onClick="{{ onDoneToHistory }}" style="width:100%; background:none; border:none; color:oklch(46% 0.12 235); font-family:'Poppins',sans-serif; font-weight:700; font-size:15px;">Done</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sHistory }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75);">
+          <div style="padding:20px 22px 10px;">
+            <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; color:oklch(28% 0.03 260); margin:0;">Your Looks</h2>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:8px 22px 16px;">
+            <sc-if value="{{ historyEmpty }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; margin-top:60px;">
+                <div style="width:88px;height:88px;border-radius:50%;background:oklch(94% 0.03 235);"></div>
+                <p style="font-family:'Poppins',sans-serif; font-weight:700; font-size:16px; color:oklch(28% 0.03 260); margin:0;">No looks saved yet</p>
+                <p style="font-size:13.5px; color:oklch(52% 0.02 260); margin:0; max-width:220px;">Complete a look and save it here to build your collection.</p>
+                <button onClick="{{ toGridTab }}" style="background:oklch(70% 0.10 235); color:white; border:none; border-radius:999px; padding:14px 22px; font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; margin-top:6px;">Discover Your First Look</button>
+              </div>
+            </sc-if>
+            <sc-for list="{{ savedLooksView }}" as="sv" hint-placeholder-count="0">
+              <div style="display:flex; gap:12px; align-items:center; background:oklch(99% 0.004 75); border-radius:18px; padding:10px; margin-bottom:10px;">
+                <div style="width:64px; height:64px; border-radius:14px; flex-shrink:0; background: repeating-linear-gradient(135deg, oklch(93% 0.02 235), oklch(93% 0.02 235) 6px, oklch(90% 0.025 235) 6px, oklch(90% 0.025 235) 12px);"></div>
+                <div style="flex:1;">
+                  <p style="margin:0; font-family:'Poppins',sans-serif; font-weight:700; font-size:14.5px; color:oklch(28% 0.03 260);">{{ sv.name }}</p>
+                  <p style="margin:0; font-size:12px; color:oklch(52% 0.02 260);">{{ sv.date }} · {{ sv.starsLabel }}</p>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; border-top:1px solid oklch(90% 0.012 90); background:oklch(99% 0.004 75); padding:10px 0 6px;">
+            <button onClick="{{ toGridTab }}" style="flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11.5px; color:{{ tabGridColor }};">
+              <span style="width:20px;height:20px;border-radius:6px;background:{{ tabGridColor }};"></span>Discover
+            </button>
+            <button onClick="{{ toHistoryTab }}" style="flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11.5px; color:{{ tabHistoryColor }};">
+              <span style="width:20px;height:20px;border-radius:50%;background:{{ tabHistoryColor }};"></span>History
+            </button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ askFriendOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; background:oklch(20% 0.02 260 / 0.45); display:flex; align-items:flex-end; z-index:20;">
+          <div style="width:100%; background:oklch(99% 0.004 75); border-radius:26px 26px 0 0; padding:22px 24px 30px; animation: floatUp 0.25s ease-out;">
+            <div style="width:40px; height:5px; border-radius:999px; background:oklch(90% 0.012 90); margin:0 auto 16px;"></div>
+            <h3 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:oklch(28% 0.03 260); margin:0 0 4px;">Get a second opinion</h3>
+            <p style="font-size:13.5px; color:oklch(52% 0.02 260); margin:0 0 16px;">{{ askFriendSubtitle }}</p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+              <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="4">
+                <button onClick="{{ c.onToggle }}" style="padding:10px 16px; border-radius:999px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; background:{{ c.bg }}; border:2px solid {{ c.border }}; color:{{ c.color }};">{{ c.name }}</button>
+              </sc-for>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button onClick="{{ closeAskFriend }}" style="flex:1; background:oklch(93% 0.01 90); border:none; color:oklch(28% 0.03 260); border-radius:999px; padding:15px; font-family:'Poppins',sans-serif; font-weight:700; font-size:14.5px;">Cancel</button>
+              <button onClick="{{ sendAskFriend }}" disabled="{{ sendDisabled }}" style="flex:2; background:{{ sendBg }}; border:none; color:white; border-radius:999px; padding:15px; font-family:'Poppins',sans-serif; font-weight:700; font-size:14.5px;">Send</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; bottom:26px; left:50%; background:oklch(28% 0.03 260); color:white; padding:12px 20px; border-radius:999px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; white-space:nowrap; animation: toastIn 0.25s ease-out;">{{ toast }}</div>
+      </sc-if>
+
+    </x-import>
+  </div>
+</section>
+
+<section id="0a" style="position: relative; padding: 8px 24px 64px; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <span style="background: oklch(78% 0.11 30); color: oklch(28% 0.03 260); font-family: 'Poppins',sans-serif; font-weight:700; font-size:13px; padding:5px 12px; border-radius:999px;">Android</span>
+    <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color: oklch(28% 0.03 260); margin:0;">Key screens, reskinned for Material</h2>
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:40px; justify-content:center;">
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" title="Your Looks" large="{{ true }}" hint-size="390,844">
+      <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75);">
+        <div style="padding:14px 20px 8px;">
+          <p style="font-size:12px; font-weight:700; color:oklch(46% 0.12 235); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 2px;">Wedding Guest</p>
+          <h2 style="font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:oklch(28% 0.03 260); margin:0;">Your Looks</h2>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:6px 20px 16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <sc-for list="{{ androidLooks }}" as="lk" hint-placeholder-count="4">
+            <div style="border-radius:16px; overflow:hidden; background:oklch(99% 0.004 75); box-shadow:0 4px 14px oklch(28% 0.03 260 / 0.08);">
+              <div style="position:relative; width:100%; height:130px; background: repeating-linear-gradient(135deg, oklch(93% 0.02 235), oklch(93% 0.02 235) 10px, oklch(90% 0.025 235) 10px, oklch(90% 0.025 235) 20px);">
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:9.5px; color:oklch(55% 0.02 260); text-align:center; padding:0 10px;">selfie · {{ lk.name }}</div>
+                <div style="position:absolute; inset:0; background:{{ lk.tint }}; mix-blend-mode:multiply;"></div>
+                <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, oklch(20% 0.02 260 / 0.55));"></div>
+                <p style="position:absolute; left:10px; bottom:8px; color:white; font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; margin:0;">{{ lk.name }}</p>
+              </div>
+              <p style="margin:0; padding:8px 10px 10px; font-size:11px; color:oklch(52% 0.02 260); font-weight:600;">{{ lk.steps }} steps · {{ lk.time }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" title="Soft Glam" hint-size="390,844">
+      <div style="height:100%; display:flex; flex-direction:column; background: oklch(97% 0.014 75); padding: 16px 18px 22px;">
+        <div style="display:flex; gap:6px; margin-bottom:16px;">
+          <sc-for list="{{ androidDots }}" as="d" hint-placeholder-count="5">
+            <div style="flex:1; height:7px; border-radius:999px; background:{{ d.color }};"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <div style="width:40px;height:40px;border-radius:12px;background:oklch(94% 0.03 235);"></div>
+          <div>
+            <p style="margin:0; font-size:11px; font-weight:700; color:oklch(52% 0.02 260); text-transform:uppercase;">Step 3 of 5</p>
+            <h3 style="margin:0; font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:oklch(28% 0.03 260);">Eyes</h3>
+          </div>
+        </div>
+        <p style="font-size:14px; line-height:1.5; color:oklch(28% 0.03 260); margin:0 0 12px;">Sweep a soft transition shade through your crease, then pat a slightly deeper tone onto the outer third of your lid.</p>
+        <div style="background:oklch(94% 0.035 30); border-radius:14px; padding:12px 14px; margin-bottom:16px;">
+          <p style="margin:0 0 4px; font-size:11px; font-weight:800; color:oklch(55% 0.14 25); text-transform:uppercase;">Pro Tip</p>
+          <p style="margin:0; font-size:12.5px; line-height:1.5; color:oklch(35% 0.05 25);">Use a clean, fluffy brush to soften every hard edge.</p>
+        </div>
+        <div style="flex:1;"></div>
+        <button style="background: oklch(70% 0.10 235); color:white; border:none; border-radius:14px; padding:15px; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px;">Next Step</button>
+      </div>
+    </x-import>
+  </div>
+</section>
+
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LOOKS = [
+  { id: 'soft-glam', name: 'Soft Glam', tagline: 'Radiant everyday glam with a soft-focus finish.', steps: 5, time: '25 min', coverage: 'Medium', hue: 235 },
+  { id: 'natural-glow', name: 'Natural Glow', tagline: 'Your-skin-but-better, dewy and effortless.', steps: 4, time: '15 min', coverage: 'Light', hue: 30 },
+  { id: 'bold-smokey', name: 'Bold Smokey', tagline: 'Sultry, smudged eyes for a night that means business.', steps: 5, time: '35 min', coverage: 'Full', hue: 280 },
+  { id: 'bridal-classic', name: 'Bridal Classic', tagline: 'Timeless, camera-ready, made to last all day.', steps: 5, time: '40 min', coverage: 'Full', hue: 340 },
+];
+
+const STEP_TEMPLATES = [
+  { key: 'foundation', title: 'Foundation', instruction: "Warm a pea-sized drop between your fingertips, then blend outward from the center of your face toward your hairline.", tip: "Buff in small circles with a damp sponge — it presses product into skin instead of sitting on top, which is what causes patchiness.",
+    products: [ { tier: 'Drugstore', name: 'Dew Drop Second-Skin Foundation', price: '$11', shade: '2W Light Warm' }, { tier: 'Mid-Range', name: 'Velvet Hour Soft-Focus Foundation', price: '$34', shade: '220 Warm' }, { tier: 'Luxury', name: 'Maison Lumière Silk Veil Foundation', price: '$62', shade: '6.5 Warm' } ] },
+  { key: 'concealer', title: 'Concealer', instruction: "Dot concealer in a triangle under each eye and blend with a light tapping motion — never rub, or it'll crease.", tip: "Set with a very small amount of translucent powder pressed in with a puff, not brushed, to stop it settling into fine lines.",
+    products: [ { tier: 'Drugstore', name: 'Dew Drop Bright Eyes Concealer', price: '$8', shade: 'Light Warm' }, { tier: 'Mid-Range', name: 'Velvet Hour Second Skin Concealer', price: '$27', shade: '2.5' }, { tier: 'Luxury', name: 'Maison Lumière Radiant Touch Concealer', price: '$46', shade: '3' } ] },
+  { key: 'eyes', title: 'Eyes', instruction: "Sweep a soft transition shade through your crease, then pat a slightly deeper tone onto the outer third of your lid.", tip: "Use a clean, fluffy brush to soften every hard edge — that's the difference between blended and muddy.",
+    products: [ { tier: 'Drugstore', name: 'Dew Drop Everyday Eye Palette', price: '$14', shade: 'Warm Neutrals' }, { tier: 'Mid-Range', name: 'Velvet Hour Nine-Shade Palette', price: '$36', shade: 'Sunlit' }, { tier: 'Luxury', name: 'Maison Lumière Atelier Eye Palette', price: '$78', shade: 'Golden Hour' } ] },
+  { key: 'brows', title: 'Brows', instruction: "Use short, hair-like strokes to fill in sparse spots, following your natural growth pattern, then brush through to blend.", tip: "Go one shade lighter than your hair color if you're unsure — it always looks more natural than going darker.",
+    products: [ { tier: 'Drugstore', name: 'Dew Drop Brow Definer', price: '$7', shade: 'Ash Brown' }, { tier: 'Mid-Range', name: 'Velvet Hour Micro Brow Pen', price: '$22', shade: 'Soft Brunette' }, { tier: 'Luxury', name: 'Maison Lumière Sculpting Brow Wax', price: '$34', shade: 'Taupe' } ] },
+  { key: 'lips', title: 'Lips', instruction: "Line your lips just inside your natural line, then fill in fully before adding color on top for longer wear.", tip: "Blot with a tissue and reapply a thin second layer — it doubles your wear time without looking heavy.",
+    products: [ { tier: 'Drugstore', name: 'Dew Drop Velvet Matte Lip', price: '$9', shade: 'Rosewood' }, { tier: 'Mid-Range', name: 'Velvet Hour Cushion Lip Tint', price: '$24', shade: 'Blush Nude' }, { tier: 'Luxury', name: 'Maison Lumière Rouge Silk Lipstick', price: '$40', shade: 'Nude Petal' } ] },
+];
+
+const BLUE = 'oklch(70% 0.10 235)';
+const BLUE_DARK = 'oklch(46% 0.12 235)';
+const BLUE_PALE = 'oklch(94% 0.03 235)';
+const CORAL = 'oklch(78% 0.11 30)';
+const CORAL_DARK = 'oklch(55% 0.14 25)';
+const CORAL_PALE = 'oklch(94% 0.035 30)';
+const INK = 'oklch(28% 0.03 260)';
+const MUTED = 'oklch(52% 0.02 260)';
+const BORDER = 'oklch(90% 0.012 90)';
+const WHITE = 'oklch(99% 0.004 75)';
+
+function tintFor(hue) { return 'oklch(80% 0.09 ' + hue + ' / 0.28)'; }
+
+class Component extends DCLogic {
+  state = {
+    screen: 'welcome', skinType: null, skill: null, profession: null,
+    occasion: null, occasionOther: '', showStyleRef: false,
+    loadingMsgIndex: 0, compareIds: [], activeLookId: null,
+    askFriendOpen: false, askFriendTargets: [], selectedContacts: [],
+    stepIndex: 0, rating: 0, savedLooks: [], toast: '', activeTab: 'grid',
+    completionKey: 0,
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.screen === 'finding' && prevState.screen !== 'finding') {
+      this._msgTimer = setInterval(() => this.setState(s => ({ loadingMsgIndex: (s.loadingMsgIndex + 1) % 3 })), 900);
+      this._advanceTimer = setTimeout(() => { this.clearFindingTimers(); this.setState({ screen: 'grid' }); }, 2700);
+    }
+    if (this.state.screen !== 'finding' && prevState.screen === 'finding') this.clearFindingTimers();
+  }
+  componentWillUnmount() { this.clearFindingTimers(); }
+  clearFindingTimers() { clearInterval(this._msgTimer); clearTimeout(this._advanceTimer); }
+
+  go = (screen) => this.setState({ screen });
+  getLook = (id) => LOOKS.find(l => l.id === id) || LOOKS[0];
+
+  selectSkin = (v) => this.setState({ skinType: v });
+  selectSkill = (v) => this.setState({ skill: v });
+  selectProfession = (v) => this.setState({ profession: v });
+  selectOccasion = (v) => this.setState({ occasion: v, occasionOther: v === 'other' ? this.state.occasionOther : '' });
+  setOccasionOther = (e) => this.setState({ occasionOther: e.target.value });
+  toggleStyleRef = () => this.setState({ showStyleRef: true });
+
+  toggleCompare = (id) => this.setState(s => ({ compareIds: s.compareIds.includes(id) ? s.compareIds.filter(x => x !== id) : [...s.compareIds, id].slice(-3) }));
+  openDetail = (id) => this.setState({ activeLookId: id, screen: 'detail' });
+  startLook = (id) => this.setState({ activeLookId: id, screen: 'steps', stepIndex: 0, rating: 0 });
+
+  openAskFriend = (ids) => this.setState({ askFriendOpen: true, askFriendTargets: ids, selectedContacts: [] });
+  toggleContact = (name) => this.setState(s => ({ selectedContacts: s.selectedContacts.includes(name) ? s.selectedContacts.filter(n => n !== name) : [...s.selectedContacts, name] }));
+  closeAskFriend = () => this.setState({ askFriendOpen: false });
+  sendAskFriend = () => {
+    if (!this.state.selectedContacts.length) return;
+    this.setState({ askFriendOpen: false, toast: 'Sent! Your friend will love it.' });
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast: '' }), 2600);
+  };
+
+  onStepBack = () => this.state.stepIndex > 0 ? this.setState(s => ({ stepIndex: s.stepIndex - 1 })) : this.setState({ screen: 'detail' });
+  onStepNext = () => {
+    const total = this.getLook(this.state.activeLookId).steps;
+    if (this.state.stepIndex >= total - 1) this.setState({ screen: 'completion', completionKey: this.state.completionKey + 1 });
+    else this.setState(s => ({ stepIndex: s.stepIndex + 1 }));
+  };
+  jumpStep = (i) => { if (i <= this.state.stepIndex) this.setState({ stepIndex: i }); };
+
+  setRating = (n) => this.setState({ rating: n });
+  onSaveLook = () => {
+    const look = this.getLook(this.state.activeLookId);
+    this.setState(s => ({ savedLooks: [...s.savedLooks, { key: Date.now(), name: look.name, date: 'Today', rating: s.rating || 5 }], toast: 'Saved to your looks' }));
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast: '' }), 2200);
+  };
+  onTryAnother = () => this.setState({ screen: 'grid', compareIds: [] });
+  onDoneToHistory = () => this.setState({ screen: 'history', activeTab: 'history' });
+
+  renderVals() {
+    const s = this.state;
+    const skinOptions = ['Oily', 'Dry', 'Combination', 'Normal', 'Sensitive'];
+    const skillOptions = [
+      { v: 'Beginner', d: 'New to makeup, keep it simple' },
+      { v: 'Intermediate', d: 'Comfortable with the basics' },
+      { v: 'Advanced', d: 'I know my way around a palette' },
+    ];
+    const professionOptions = ['Student', 'Corporate / Office', 'Creative / Artist', 'Healthcare', 'Hospitality / Service', 'Other'];
+    const occasionOptions = ['Wedding Guest', 'Date Night', 'Interview', 'Everyday', 'Night Out', 'Formal', 'Other'];
+    const contactNames = ['Mom', 'Bestie Jess', 'Roommate Sam', 'Sister Ava'];
+
+    const activeLook = this.getLook(s.activeLookId || LOOKS[0].id);
+    const currentStepTpl = STEP_TEMPLATES[Math.min(s.stepIndex, STEP_TEMPLATES.length - 1)];
+
+    return {
+      frameTitle: 'Glowith',
+      sWelcome: s.screen === 'welcome', sSkin: s.screen === 'skin', sSkill: s.screen === 'skill',
+      sProfession: s.screen === 'profession', sCamera: s.screen === 'camera', sOccasion: s.screen === 'occasion',
+      sFinding: s.screen === 'finding', sGrid: s.screen === 'grid', sDetail: s.screen === 'detail',
+      sSteps: s.screen === 'steps', sCompletion: s.screen === 'completion', sHistory: s.screen === 'history',
+
+      toWelcome: () => this.go('welcome'), toSkin: () => this.go('skin'), toSkill: () => this.go('skill'),
+      toProfession: () => this.go('profession'), toCamera: () => this.go('camera'), toOccasion: () => this.go('occasion'),
+      toFinding: () => this.go('finding'), toGrid: () => this.go('grid'), toSteps: () => this.go('steps'),
+      toGridTab: () => this.setState({ screen: 'grid', activeTab: 'grid' }), toHistoryTab: () => this.setState({ screen: 'history', activeTab: 'history' }),
+
+      skinTypes: skinOptions.map(v => ({ label: v, selected: s.skinType === v, onSelect: () => this.selectSkin(v), bg: s.skinType === v ? BLUE_PALE : WHITE, border: s.skinType === v ? BLUE : BORDER, color: s.skinType === v ? BLUE_DARK : INK })),
+      skinNextDisabled: !s.skinType, skinNextBg: s.skinType ? BLUE : BORDER,
+
+      skillLevels: skillOptions.map(o => ({ label: o.v, desc: o.d, onSelect: () => this.selectSkill(o.v), bg: s.skill === o.v ? BLUE_PALE : WHITE, border: s.skill === o.v ? BLUE : BORDER, color: s.skill === o.v ? BLUE_DARK : INK })),
+      skillNextDisabled: !s.skill, skillNextBg: s.skill ? BLUE : BORDER,
+
+      professions: professionOptions.map(v => ({ label: v, onSelect: () => this.selectProfession(v), bg: s.profession === v ? BLUE_PALE : WHITE, border: s.profession === v ? BLUE : BORDER, color: s.profession === v ? BLUE_DARK : INK })),
+      professionNextDisabled: !s.profession, professionNextBg: s.profession ? BLUE : BORDER,
+
+      occasionChips: occasionOptions.map(v => ({ label: v, onSelect: () => this.selectOccasion(v), bg: s.occasion === v ? BLUE_PALE : WHITE, border: s.occasion === v ? BLUE : BORDER, color: s.occasion === v ? BLUE_DARK : INK })),
+      showOtherField: s.occasion === 'Other', occasionOther: s.occasionOther, setOccasionOther: this.setOccasionOther,
+      showStyleRef: s.showStyleRef, showStyleRefToggle: !s.showStyleRef, toggleStyleRef: this.toggleStyleRef,
+      occasionNextDisabled: !s.occasion, occasionNextBg: s.occasion ? BLUE : BORDER,
+
+      loadingMessage: ['Analyzing your skin tone...', 'Matching your features...', 'Curating your looks...'][s.loadingMsgIndex],
+
+      occasionLabel: s.occasion === 'Other' && s.occasionOther ? s.occasionOther : (s.occasion || 'Everyday'),
+      looks: LOOKS.map(lk => ({ ...lk, selfieId: 'selfie-card-' + lk.id, tint: tintFor(lk.hue), compareBg: s.compareIds.includes(lk.id) ? BLUE : 'oklch(60% 0.01 90 / 0.55)', onOpen: () => this.openDetail(lk.id), onToggleCompare: () => this.toggleCompare(lk.id) })),
+      hasCompare: s.compareIds.length > 0,
+      compareCountLabel: s.compareIds.length + (s.compareIds.length === 1 ? ' look selected' : ' looks selected'),
+      onAskFriendCompare: () => this.openAskFriend(s.compareIds),
+      tabGridColor: s.activeTab === 'grid' ? BLUE : MUTED, tabHistoryColor: s.activeTab === 'history' ? BLUE : MUTED,
+
+      activeLook: { ...activeLook, tint: tintFor(activeLook.hue) },
+      onAskFriendSingle: () => this.openAskFriend([activeLook.id]),
+
+      progressDots: STEP_TEMPLATES.slice(0, activeLook.steps).map((t, i) => ({ onJump: () => this.jumpStep(i), color: i < s.stepIndex ? BLUE : i === s.stepIndex ? BLUE : BORDER })).map((d, i) => ({ ...d, color: i <= s.stepIndex ? BLUE : BORDER })),
+      currentStep: {
+        number: s.stepIndex + 1, title: currentStepTpl.title, instruction: currentStepTpl.instruction, tip: currentStepTpl.tip,
+        iconBg: tintFor(activeLook.hue),
+        products: currentStepTpl.products.map(p => ({ ...p, swatchBg: p.tier === 'Drugstore' ? 'oklch(90% 0.02 90)' : p.tier === 'Mid-Range' ? BLUE_PALE : CORAL_PALE, tierColor: p.tier === 'Drugstore' ? MUTED : p.tier === 'Mid-Range' ? BLUE_DARK : CORAL_DARK })),
+      },
+      nextButtonLabel: s.stepIndex >= activeLook.steps - 1 ? 'Finish Look' : 'Next Step',
+      onStepBack: this.onStepBack, onStepNext: this.onStepNext,
+
+      completionKey: s.completionKey,
+      stars: [1, 2, 3, 4, 5].map(n => ({ onRate: () => this.setRating(n), color: n <= s.rating ? CORAL : BORDER })),
+      onSaveLook: this.onSaveLook, onTryAnother: this.onTryAnother, onDoneToHistory: this.onDoneToHistory,
+      onAskFriendCompletion: () => this.openAskFriend([activeLook.id]),
+
+      historyEmpty: s.savedLooks.length === 0,
+      savedLooksView: s.savedLooks.map(sv => ({ ...sv, selfieId: 'selfie-history-' + sv.key, starsLabel: '★'.repeat(sv.rating) })),
+
+      askFriendOpen: s.askFriendOpen,
+      askFriendSubtitle: s.askFriendTargets.length > 1 ? 'Send these looks and get their honest opinion.' : 'Send this look and get their honest opinion.',
+      contacts: contactNames.map(name => ({ name, onToggle: () => this.toggleContact(name), bg: s.selectedContacts.includes(name) ? BLUE_PALE : WHITE, border: s.selectedContacts.includes(name) ? BLUE : BORDER, color: s.selectedContacts.includes(name) ? BLUE_DARK : INK })),
+      closeAskFriend: this.closeAskFriend, sendAskFriend: this.sendAskFriend,
+      sendDisabled: s.selectedContacts.length === 0, sendBg: s.selectedContacts.length ? BLUE : BORDER,
+
+      hasToast: !!s.toast, toast: s.toast,
+
+      androidLooks: LOOKS.slice(0, 4).map(lk => ({ ...lk, selfieId: 'selfie-android-' + lk.id, tint: tintFor(lk.hue) })),
+      androidDots: [0, 1, 2, 3, 4].map(i => ({ color: i <= 2 ? BLUE : BORDER })),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
