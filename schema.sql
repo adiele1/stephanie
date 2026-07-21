@@ -146,17 +146,20 @@ create policy "sessions select own" on sessions for select to authenticated usin
 create policy "sessions insert own" on sessions for insert to authenticated with check (auth.uid() = user_id);
 create policy "sessions update own" on sessions for update to authenticated using (auth.uid() = user_id);
 
+-- Catalog content is public: readable by anon AND authenticated. The actual product
+-- flow shows matched looks before any sign-in step, so gating this behind auth would
+-- just break the core "see your looks" moment. Nothing sensitive lives here.
 alter table looks enable row level security;
-create policy "looks readable" on looks for select to authenticated using (true);
+create policy "looks readable" on looks for select to anon, authenticated using (true);
 
 alter table look_steps enable row level security;
-create policy "look_steps readable" on look_steps for select to authenticated using (true);
+create policy "look_steps readable" on look_steps for select to anon, authenticated using (true);
 
 alter table products enable row level security;
-create policy "products readable" on products for select to authenticated using (true);
+create policy "products readable" on products for select to anon, authenticated using (true);
 
 alter table look_step_products enable row level security;
-create policy "look_step_products readable" on look_step_products for select to authenticated using (true);
+create policy "look_step_products readable" on look_step_products for select to anon, authenticated using (true);
 
 alter table friend_shares enable row level security;
 create policy "friend_shares select own" on friend_shares for select to authenticated using (auth.uid() = sender_user_id);

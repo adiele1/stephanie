@@ -8,6 +8,8 @@ import { Profession } from './screens/onboarding/Profession';
 import { Camera } from './screens/onboarding/Camera';
 import { Occasion } from './screens/onboarding/Occasion';
 import { Finding } from './screens/looks/Finding';
+import { Grid } from './screens/looks/Grid';
+import { Detail } from './screens/looks/Detail';
 import { PlaceholderNext } from './screens/PlaceholderNext';
 
 function App() {
@@ -24,7 +26,9 @@ function App() {
             <Route path="/onboarding/camera" element={<Camera />} />
             <Route path="/onboarding/occasion" element={<Occasion />} />
             <Route path="/looks/finding" element={<Finding />} />
-            <Route path="/looks/grid" element={<PlaceholderNext />} />
+            <Route path="/looks/grid" element={<Grid />} />
+            <Route path="/looks/detail" element={<Detail />} />
+            <Route path="/looks/steps" element={<PlaceholderNext />} />
           </Routes>
         </SessionProvider>
       </OnboardingProvider>
