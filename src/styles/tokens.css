@@ -59,21 +59,14 @@
   --radius-pill: 999px;
 }
 
-:root[data-theme='dark'] {
-  --color-page-bg: oklch(17% 0.014 265);
-  --color-page-fg: oklch(94% 0.006 90);
-  --color-panel-bg: oklch(22% 0.017 265);
-  --color-chip-bg: oklch(27% 0.016 265);
-  --color-border: oklch(32% 0.014 265);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --color-page-bg: oklch(17% 0.014 265);
-    --color-page-fg: oklch(94% 0.006 90);
-    --color-panel-bg: oklch(22% 0.017 265);
-    --color-chip-bg: oklch(27% 0.016 265);
-    --color-border: oklch(32% 0.014 265);
-  }
+/* Glowith commits to one visual world (the approved light blush/blue palette) rather
+   than auto-switching with the phone's system dark-mode setting — a real dark variant
+   was never designed or approved, and letting `prefers-color-scheme` flip only the
+   background tokens (not text) is what caused dark text to render on a dark background
+   and go nearly illegible. If a proper dark theme gets designed later, wire it up
+   deliberately (e.g. an in-app toggle setting `data-theme="dark"`), not automatically. */
+:root {
+  color-scheme: light;
 }
 
 /* shared primitives used across screens */

@@ -18,7 +18,7 @@ body {
   color: var(--color-page-fg);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
 h1,
