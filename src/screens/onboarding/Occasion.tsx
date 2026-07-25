@@ -28,8 +28,14 @@ function UploadSlot({
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrl = file ? URL.createObjectURL(file) : null;
 
+  function handleRemove(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (inputRef.current) inputRef.current.value = ''; // lets re-picking the same file fire onChange again
+    onPick(null);
+  }
+
   return (
-    <>
+    <div style={{ position: 'relative', width: '100%', height }}>
       <input
         ref={inputRef}
         type="file"
@@ -42,7 +48,7 @@ function UploadSlot({
         onClick={() => inputRef.current?.click()}
         style={{
           width: '100%',
-          height,
+          height: '100%',
           borderRadius: 22,
           border: '2.5px dashed oklch(78% 0.08 255)',
           backgroundColor: previewUrl ? 'transparent' : 'var(--color-blue-pale)',
@@ -60,7 +66,32 @@ function UploadSlot({
       >
         {!previewUrl && `📸 ${label}`}
       </button>
-    </>
+      {previewUrl && (
+        <button
+          onClick={handleRemove}
+          aria-label="Remove photo"
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            border: 'none',
+            background: 'oklch(20% 0.02 260 / 0.6)',
+            color: '#fff',
+            fontSize: 14,
+            lineHeight: 1,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          ✕
+        </button>
+      )}
+    </div>
   );
 }
 

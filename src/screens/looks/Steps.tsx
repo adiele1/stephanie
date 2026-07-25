@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../state/SessionContext';
 import { fetchLookSteps, type LookStep } from '../../lib/steps';
 import { TechniqueDiagram } from '../../components/technique/TechniqueDiagram';
+import { HomeButton } from '../../components/HomeButton';
 
 const TIER_LABEL: Record<string, string> = { drugstore: 'Drugstore', mid: 'Mid-Range', luxury: 'Luxury' };
 const TIER_COLOR: Record<string, string> = {
@@ -60,7 +61,7 @@ export function Steps() {
         <p style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 14, margin: 0 }}>
           {look.name}
         </p>
-        <div style={{ width: 32 }} />
+        <HomeButton />
       </div>
 
       <div style={{ display: 'flex', gap: 5, marginBottom: 16 }}>

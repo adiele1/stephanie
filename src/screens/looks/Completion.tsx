@@ -5,6 +5,7 @@ import { useSession } from '../../state/SessionContext';
 import { LookRenderCanvas } from '../../components/LookRenderCanvas';
 import { CelebrateIllustration } from '../../components/illustrations/CelebrateIllustration';
 import { saveCompletedSession } from '../../lib/sessions';
+import { HomeButton } from '../../components/HomeButton';
 
 export function Completion() {
   const navigate = useNavigate();
@@ -47,6 +48,9 @@ export function Completion() {
         overflowY: 'auto',
       }}
     >
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', marginBottom: 4 }}>
+        <HomeButton />
+      </div>
       <CelebrateIllustration />
       <h2 style={{ fontWeight: 600, fontSize: 22, margin: '2px 0 4px', textAlign: 'center' }}>You did it! ✨</h2>
       <p style={{ fontSize: 13, color: 'var(--color-muted)', margin: '0 0 14px', textAlign: 'center' }}>
