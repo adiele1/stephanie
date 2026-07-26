@@ -1,8 +1,19 @@
 import { FaceLandmarker, FilesetResolver, type NormalizedLandmark } from '@mediapipe/tasks-vision';
 
 // Validated by the standalone spike (spike/face-render-spike.html) before this got built for
-// real: MediaPipe Face Landmarker running on-device (WASM) + Canvas multiply/overlay blending
+// real: MediaPipe Face Landmarker running on-device (WASM) + Canvas blend-mode compositing
 // produces a real, measurable color shift at the lips/cheeks without any ML training.
+//
+// Rendering technique (v2, after the first pass looked like a smudge rather than makeup):
+// the eyeshadow region used to be a crude interpolation between the eye contour and the
+// eyebrow, which overshot onto the brow itself. Replaced with the EYESHADOW_LEFT/RIGHT
+// landmark sets from a working reference implementation (github.com/Jayanths9/Virtual_Makeup,
+// MediaPipe FaceMesh + OpenCV) that traces an actual lid-shaped region. Blend modes were
+// also reconsidered: lips use the CSS/Canvas 'color' compositing mode (recolors hue+
+// saturation while preserving the lip's own luminosity/shine — much closer to how tinted
+// cosmetics actually look than a flat multiply), eyeshadow uses 'multiply' at a lower
+// alpha with heavier, resolution-scaled feathering so it reads as blended pigment rather
+// than a hard-edged fill.
 
 let landmarkerPromise: Promise<FaceLandmarker> | null = null;
 
@@ -41,10 +52,14 @@ export async function detectFaceLandmarks(
 const LIPS_OUTER = [
   61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61,
 ];
-const RIGHT_EYE_UPPER = [33, 246, 161, 160, 159, 158, 157, 173, 133];
-const RIGHT_BROW = [70, 63, 105, 66, 107, 55, 65];
-const LEFT_EYE_UPPER = [263, 466, 388, 387, 386, 385, 384, 398, 362];
-const LEFT_BROW = [300, 293, 334, 296, 336, 285, 295];
+// Dedicated eyeshadow contours (not the eye-opening contour itself) — traces a proper
+// lid-shaped region between the lash line and crease, staying clear of the eyebrow.
+const EYESHADOW_RIGHT = [
+  226, 247, 30, 29, 27, 28, 56, 190, 243, 173, 157, 158, 159, 160, 161, 246, 33, 130, 226,
+];
+const EYESHADOW_LEFT = [
+  463, 414, 286, 258, 257, 259, 260, 467, 446, 359, 263, 466, 388, 387, 386, 385, 384, 398, 362, 463,
+];
 const RIGHT_CHEEK = 205;
 const LEFT_CHEEK = 425;
 
@@ -69,35 +84,18 @@ function fillPoly(
   fillStyle: string,
   composite: GlobalCompositeOperation,
   alpha: number,
+  blurPx: number,
 ) {
   ctx.save();
   ctx.globalCompositeOperation = composite;
   ctx.globalAlpha = alpha;
   ctx.fillStyle = fillStyle;
-  ctx.filter = 'blur(2px)';
+  ctx.filter = `blur(${blurPx}px)`;
   ctx.beginPath();
   points.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
   ctx.closePath();
   ctx.fill();
   ctx.restore();
-}
-
-// MediaPipe FaceMesh has no explicit "eyelid" landmark group — approximate the lid/crease
-// area by lofting the upper-eye contour up toward the brow.
-function lidPolygon(
-  landmarks: NormalizedLandmark[],
-  eyeIdx: number[],
-  browIdx: number[],
-  w: number,
-  h: number,
-): Point[] {
-  const eye = polygon(landmarks, eyeIdx, w, h);
-  const brow = polygon(landmarks, browIdx, w, h);
-  const lifted = eye.map(([x, y], i): Point => {
-    const b = brow[Math.min(i, brow.length - 1)];
-    return [x * 0.45 + b[0] * 0.55, y * 0.45 + b[1] * 0.55];
-  });
-  return [...eye, ...lifted.reverse()];
 }
 
 /** Paints a look's lip/eyeshadow/blush recipe onto `canvas`, drawing `image` as the base
@@ -120,9 +118,16 @@ export function renderLookOnCanvas(
 
   if (!landmarks) return;
 
-  fillPoly(ctx, polygon(landmarks, LIPS_OUTER, w, h), palette.lipColor, 'multiply', 0.75);
-  fillPoly(ctx, lidPolygon(landmarks, RIGHT_EYE_UPPER, RIGHT_BROW, w, h), palette.shadowColor, 'overlay', 0.55);
-  fillPoly(ctx, lidPolygon(landmarks, LEFT_EYE_UPPER, LEFT_BROW, w, h), palette.shadowColor, 'overlay', 0.55);
+  // Blur scales with the photo's resolution — a fixed pixel blur reads as sharp on a
+  // high-res selfie and mushy on a small one. 'color' mode recolors hue+saturation while
+  // keeping the lips' own shading/shine, which looks like tinted lips rather than paint.
+  const lipBlur = Math.max(3, w * 0.006);
+  const eyeBlur = Math.max(3, w * 0.006);
+  const blushBlur = Math.max(4, w * 0.01);
+
+  fillPoly(ctx, polygon(landmarks, LIPS_OUTER, w, h), palette.lipColor, 'color', 0.85, lipBlur);
+  fillPoly(ctx, polygon(landmarks, EYESHADOW_RIGHT, w, h), palette.shadowColor, 'multiply', 0.5, eyeBlur);
+  fillPoly(ctx, polygon(landmarks, EYESHADOW_LEFT, w, h), palette.shadowColor, 'multiply', 0.5, eyeBlur);
 
   for (const idx of [RIGHT_CHEEK, LEFT_CHEEK]) {
     const [cx, cy] = pt(landmarks, idx, w, h);
@@ -132,7 +137,8 @@ export function renderLookOnCanvas(
     grad.addColorStop(1, 'transparent');
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.45;
+    ctx.filter = `blur(${blushBlur}px)`;
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
