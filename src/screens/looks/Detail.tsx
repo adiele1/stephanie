@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../state/SessionContext';
 import { LookRenderCanvas } from '../../components/LookRenderCanvas';
+import { LookFullscreenViewer } from '../../components/LookFullscreenViewer';
 
 export function Detail() {
   const navigate = useNavigate();
   const { selfieImage, landmarks, looks, activeLookId, setStepIndex, setRating } = useSession();
   const look = looks.find((l) => l.id === activeLookId);
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   if (!selfieImage || !look) {
     navigate('/looks/grid', { replace: true });
@@ -15,18 +18,49 @@ export function Detail() {
   return (
     <div style={{ minHeight: '100%', maxWidth: 480, margin: '0 auto', display: 'flex', flexDirection: 'column', background: 'var(--color-page-bg)' }}>
       <div style={{ position: 'relative', height: 280, flexShrink: 0 }}>
-        <LookRenderCanvas image={selfieImage} landmarks={landmarks} palette={look.palette} />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(180deg, oklch(20% 0.02 260 / 0.3), transparent 30%, transparent 70%, var(--color-page-bg) 100%)',
-            pointerEvents: 'none',
-          }}
-        />
         <button
-          onClick={() => navigate('/looks/grid')}
+          onClick={() => setViewerOpen(true)}
+          aria-label={`View the full ${look.name} look`}
+          style={{ position: 'absolute', inset: 0, border: 'none', padding: 0, cursor: 'pointer', display: 'block', width: '100%', height: '100%' }}
+        >
+          <LookRenderCanvas image={selfieImage} landmarks={landmarks} palette={look.palette} />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background:
+                'linear-gradient(180deg, oklch(20% 0.02 260 / 0.3), transparent 30%, transparent 70%, var(--color-page-bg) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 12,
+              right: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'rgba(20,20,30,0.55)',
+              color: '#fff',
+              fontSize: 11.5,
+              fontWeight: 700,
+              padding: '7px 12px',
+              borderRadius: 999,
+              pointerEvents: 'none',
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3" />
+            </svg>
+            See full look
+          </div>
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate('/looks/grid');
+          }}
           aria-label="Back"
           style={{
             position: 'absolute',
@@ -39,6 +73,7 @@ export function Detail() {
             background: 'rgba(255,255,255,0.9)',
             fontSize: 15,
             cursor: 'pointer',
+            zIndex: 1,
           }}
         >
           ←
@@ -90,6 +125,15 @@ export function Detail() {
           Start This Look
         </button>
       </div>
+      {viewerOpen && (
+        <LookFullscreenViewer
+          image={selfieImage}
+          landmarks={landmarks}
+          palette={look.palette}
+          lookName={look.name}
+          onClose={() => setViewerOpen(false)}
+        />
+      )}
     </div>
   );
 }
